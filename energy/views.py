@@ -38,12 +38,6 @@ def energy_usage(request):
     b_name = request.data.get('b_name', '')
     from_dt = request.data.get('from_dt', '')
     to_dt = request.data.get('to_dt', '')
-    
-    # b_name = 'ABC'
-    # from_dt = '2017-06-01'
-    # to_dt = '2017-06-01'
-
-    print(b_name, from_dt, to_dt)
 
     from_dt = datetime.strptime(from_dt, '%Y-%m-%d')    
     to_dt = datetime.strptime(to_dt, '%Y-%m-%d')   
