@@ -1,8 +1,10 @@
 import os
 import sys
+import math
 from datetime import datetime, timedelta
 import numpy as np
-from shutil import move
+import pandas as pd
+
 from django.conf import settings
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
@@ -42,12 +44,21 @@ def energy_usage(request):
     from_dt = datetime.strptime(from_dt, '%Y-%m-%d')    
     to_dt = datetime.strptime(to_dt, '%Y-%m-%d')   
 
+    qs =  EnergyUsage.objects.filter(
+        b_name=b_name, daq_time__date__gte=from_dt, 
+        daq_time__date__lte=to_dt).order_by('-p_usage').first()
+    if qs:
+        max_usage = math.ceil(qs.p_usage + qs.p_usage*0.1)
+    else:
+        max_usage = 100
+
     qs = EnergyUsage.objects.filter(
         b_name=b_name, daq_time__date__gte=from_dt, 
         daq_time__date__lte=to_dt).order_by('daq_time')
 
     res = {}
     x_axis = []
+    energy_usage = []
     p_usage = []
     prediction = []
     temp = []
@@ -59,8 +70,20 @@ def energy_usage(request):
         prediction.append(q.p_usage + 10)
         temp.append(q.temp)
         rh.append(q.rh)
+
+        data = {   
+            'b_name': q.b_name,
+            'date_time': dt_str,
+            'p_usage': q.p_usage,
+            'temp': q.temp,
+            'rh': q.rh,
+        }
+        energy_usage.append(data)
+
     res = {
         'x_axis':x_axis, 
+        'max_usage':max_usage, 
+        'energy_usage':energy_usage, 
         'p_usage':p_usage, 
         'prediction':prediction, 
         'temp':temp, 

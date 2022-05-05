@@ -14,6 +14,6 @@ class EnergyUsage(models.Model):
         managed = True
         db_table = 'energy_usage'
         unique_together = [['b_name', 'daq_time']]
-        ordering = ['-daq_time']
+        ordering = ['daq_time']
         verbose_name = '에너지 사용량'
         verbose_name_plural = '에너지 사용량'
